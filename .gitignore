@@ -1,0 +1,9 @@
+# Ignore all mp3 files
+*.mp3
+
+# Or only ignore mp3 inside songs folder
+songs/**/*.mp3
+
+# Optional: ignore OS & editor junk
+.DS_Store
+node_modules/

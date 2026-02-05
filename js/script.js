@@ -108,8 +108,9 @@ async function displayAlbums() {
   Array.from(document.getElementsByClassName("card")).forEach((card) => {
     card.addEventListener("click", async () => {
       songs = await getSongs(`songs/${card.dataset.folder}`);
+      currentIndex = 0; // 🔥 reset index
       if (songs.length > 0) {
-        playMusic(songs[0]);
+        playMusic(songs[0], true);
       } else {
         alert("No songs in this album yet");
       }
@@ -218,6 +219,14 @@ async function main() {
       currentSong.volume = 0.1;
       document.querySelector(".range").getElementsByTagName("input")[0].value =
         10;
+    }
+  });
+  currentSong.addEventListener("ended", () => {
+    if (currentIndex < songs.length - 1) {
+      currentIndex++;
+      playMusic(songs[currentIndex]);
+    } else {
+      play.src = "img/play.svg";
     }
   });
 }

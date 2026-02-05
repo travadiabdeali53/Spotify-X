@@ -3,6 +3,9 @@ let currentSong = new Audio();
 let songs;
 let currFolder;
 let currentIndex = 0;
+let play;
+let previous;
+let next;
 
 function secondsToMinutesSeconds(seconds) {
   if (isNaN(seconds) || seconds < 0) {
@@ -76,8 +79,16 @@ async function displayAlbums() {
   cardContainer.innerHTML = "";
 
   for (const folder of folders) {
-    let infoRes = await fetch(`songs/${folder}/info.json`);
-    let info = await infoRes.json();
+    let info = { title: folder, description: "NCS Music" };
+
+    try {
+      const infoRes = await fetch(`songs/${folder}/info.json`);
+      if (infoRes.ok) {
+        info = await infoRes.json();
+      }
+    } catch (err) {
+      console.warn(`info.json missing for ${folder}`);
+    }
 
     cardContainer.innerHTML += `
         <div data-folder="${folder}" class="card">
@@ -101,9 +112,14 @@ async function displayAlbums() {
 }
 
 async function main() {
-  const play = document.getElementById("play");
-  const previous = document.getElementById("previous");
-  const next = document.getElementById("next");
+  play = document.getElementById("play");
+  previous = document.getElementById("previous");
+  next = document.getElementById("next");
+
+  if (!play || !previous || !next) {
+    console.error("Control buttons not found");
+    return;
+  }
 
   // Get the list of all the songs
   await getSongs("songs/ncs");
@@ -142,14 +158,19 @@ async function main() {
   });
 
   // Add an event listener for hamburger
-  document.querySelector(".hamburger").addEventListener("click", () => {
-    document.querySelector(".left").style.left = "0";
-  });
+  const hamburger = document.querySelector(".hamburger");
+  if (hamburger) {
+    hamburger.addEventListener("click", () => {
+      document.querySelector(".left").style.left = "0";
+    });
+  }
 
-  // Add an event listener for close button
-  document.querySelector(".close").addEventListener("click", () => {
-    document.querySelector(".left").style.left = "-120%";
-  });
+  const closeBtn = document.querySelector(".close");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      document.querySelector(".left").style.left = "-120%";
+    });
+  }
 
   // Add an event listener to previous
   previous.addEventListener("click", () => {

@@ -52,22 +52,21 @@ async function getSongs(folder) {
 }
 
 const playMusic = (track, pause = false) => {
-    currentIndex = songs.indexOf(track);
+  currentIndex = songs.findIndex((s) => s === track);
+  if (currentIndex === -1) currentIndex = 0;
 
-    // Support both CDN URLs and local files
-    currentSong.src = track.startsWith("http")
-        ? track
-        : `${currFolder}/` + track;
+  // Support both CDN URLs and local files
+  currentSong.src = track.startsWith("http") ? track : `${currFolder}/` + track;
 
-    if (!pause) {
-        currentSong.play();
-        play.src = "img/pause.svg";
-    }
+  if (!pause) {
+    currentSong.play();
+    play.src = "img/pause.svg";
+  }
 
-    document.querySelector(".songinfo").innerText =
-        decodeURIComponent(track.split("/").pop());
+  document.querySelector(".songinfo").innerText = decodeURIComponent(
+    track.split("/").pop(),
+  );
 };
-
 
 async function displayAlbums() {
   let res = await fetch("songs/albums.json");
@@ -87,7 +86,7 @@ async function displayAlbums() {
                     <path d="M8 5v14l11-7z" fill="#000" />
                 </svg>
             </div>
-            <img src="/songs/${folder}/cover.jpg">
+            <img src="songs/${folder}/cover.jpg">
             <h2>${info.title}</h2>
             <p>${info.description}</p>
         </div>`;
@@ -102,6 +101,10 @@ async function displayAlbums() {
 }
 
 async function main() {
+  const play = document.getElementById("play");
+  const previous = document.getElementById("previous");
+  const next = document.getElementById("next");
+
   // Get the list of all the songs
   await getSongs("songs/ncs");
   playMusic(songs[0], true);
@@ -122,10 +125,13 @@ async function main() {
 
   // Listen for timeupdate event
   currentSong.addEventListener("timeupdate", () => {
-    document.querySelector(".songtime").innerHTML =
-      `${secondsToMinutesSeconds(currentSong.currentTime)} / ${secondsToMinutesSeconds(currentSong.duration)}`;
-    document.querySelector(".circle").style.left =
-      (currentSong.currentTime / currentSong.duration) * 100 + "%";
+    if (!isNaN(currentSong.duration)) {
+      document.querySelector(".songtime").innerHTML =
+        `${secondsToMinutesSeconds(currentSong.currentTime)} / ${secondsToMinutesSeconds(currentSong.duration)}`;
+
+      document.querySelector(".circle").style.left =
+        (currentSong.currentTime / currentSong.duration) * 100 + "%";
+    }
   });
 
   // Add an event listener to seekbar

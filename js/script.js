@@ -110,7 +110,7 @@ async function displayAlbums() {
       songs = await getSongs(`songs/${card.dataset.folder}`);
       currentIndex = 0; // 🔥 reset index
       if (songs.length > 0) {
-        playMusic(songs[0], true);
+        playMusic(songs[0]);
       } else {
         alert("No songs in this album yet");
       }

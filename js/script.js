@@ -31,23 +31,25 @@ async function getSongs(folder) {
   songUL.innerHTML = "";
 
   for (const song of songs) {
+    const songName = decodeURIComponent(song.split("/").pop());
+
     songUL.innerHTML += `
-        <li>
-            <img class="invert" width="34" src="img/music.svg">
-            <div class="info">
-                <div>${song.replaceAll("%20", " ")}</div>
-                <div>Unknown Artist</div>
-            </div>
-            <div class="playnow">
-                <span>Play Now</span>
-                <img class="invert" src="img/play.svg">
-            </div>
-        </li>`;
+    <li data-track="${song}">
+        <img class="invert" width="34" src="img/music.svg">
+        <div class="info">
+            <div>${songName}</div>
+            <div>Unknown Artist</div>
+        </div>
+        <div class="playnow">
+            <span>Play Now</span>
+            <img class="invert" src="img/play.svg">
+        </div>
+    </li>`;
   }
 
   Array.from(songUL.getElementsByTagName("li")).forEach((li) => {
     li.addEventListener("click", () => {
-      playMusic(li.querySelector(".info div").innerText);
+      playMusic(li.dataset.track);
     });
   });
 
@@ -106,7 +108,11 @@ async function displayAlbums() {
   Array.from(document.getElementsByClassName("card")).forEach((card) => {
     card.addEventListener("click", async () => {
       songs = await getSongs(`songs/${card.dataset.folder}`);
-      playMusic(songs[0]);
+      if (songs.length > 0) {
+        playMusic(songs[0]);
+      } else {
+        alert("No songs in this album yet");
+      }
     });
   });
 }

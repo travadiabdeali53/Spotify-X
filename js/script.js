@@ -52,18 +52,22 @@ async function getSongs(folder) {
 }
 
 const playMusic = (track, pause = false) => {
-  currentIndex = songs.indexOf(track);
+    currentIndex = songs.indexOf(track);
 
-  currentSong.src = `/${currFolder}/` + track;
+    // Support both CDN URLs and local files
+    currentSong.src = track.startsWith("http")
+        ? track
+        : `/${currFolder}/` + track;
 
-  if (!pause) {
-    currentSong.play();
-    play.src = "img/pause.svg";
-  }
+    if (!pause) {
+        currentSong.play();
+        play.src = "img/pause.svg";
+    }
 
-  document.querySelector(".songinfo").innerHTML = decodeURI(track);
-  document.querySelector(".songtime").innerHTML = "00:00 / 00:00";
+    document.querySelector(".songinfo").innerText =
+        decodeURIComponent(track.split("/").pop());
 };
+
 
 async function displayAlbums() {
   let res = await fetch("/songs/albums.json");
